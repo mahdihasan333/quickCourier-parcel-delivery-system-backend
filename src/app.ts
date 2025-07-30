@@ -1,24 +1,21 @@
-import cors from "cors";
-import express, { Request, Response } from "express";
+import cors from 'cors';
+import express, { Request, Response } from 'express';
+import { router } from './route';
+import { globalErrorHandler } from './middlewares/globalErrorHandler';
 
+const app = express();
 
+app.use(express.json());
+app.use(cors());
 
+app.use('/api/v1', router);
 
-const app = express()
+app.get('/', (req: Request, res: Response) => {
+  res.status(200).json({
+    message: 'Welcome to QuickCourier Parcel Delivery System Backend',
+  });
+});
 
+app.use(globalErrorHandler);
 
-
-app.use(express.json())
-app.use(cors())
-
-
-app.get("/", (req: Request, res: Response) => {
-    res.status(200).json({
-        message: "Welcome to QuickCourier Parcel Delivery System Backend"
-    })
-})
-
-
-
-
-export default app
+export default app;
