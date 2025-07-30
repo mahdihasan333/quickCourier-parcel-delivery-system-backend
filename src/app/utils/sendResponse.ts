@@ -1,0 +1,20 @@
+import { Response } from 'express';
+import httpStatus from 'http-status-codes';
+
+interface ResponseData {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data?: any;
+  meta?: any;
+}
+
+export const sendResponse = (res: Response, data: ResponseData) => {
+  res.status(data.statusCode).json({
+    success: data.success,
+    statusCode: data.statusCode,
+    message: data.message,
+    data: data.data,
+    meta: data.meta,
+  });
+};
