@@ -1,12 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import httpStatus from 'http-status-codes';
 import { envVars } from '../config/env';
-import { Role } from '../modules/user/user.interface';
+import { Role, IUser } from '../modules/user/user.interface';
 import AppError from '../utils/AppError';
 
 export interface AuthRequest extends Request {
-  user?: { id: string; role: Role };
+  user?: Partial<IUser>;
 }
 
 export const checkAuth = (...roles: Role[]) => {
@@ -17,13 +19,12 @@ export const checkAuth = (...roles: Role[]) => {
     }
 
     try {
-      const decoded = jwt.verify(token, envVars.JWT_ACCESS_SECRET) as { id: string; role: Role };
-      if (roles.length && !roles.includes(decoded.role)) {
+      const decoded = jwt.verify(token, envVars.JWT_ACCESS_SECRET) as Partial<IUser>;
+      if (roles.length && !roles.includes(decoded.role!)) {
         throw new AppError(httpStatus.FORBIDDEN, 'Access denied');
       }
       req.user = decoded;
       next();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.name === 'TokenExpiredError') {
         throw new AppError(httpStatus.UNAUTHORIZED, 'Token has expired');

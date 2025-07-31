@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response, NextFunction } from 'express';
 import httpStatus from 'http-status-codes';
 import AppError from '../utils/AppError';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
 export const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
   const statusCode = err instanceof AppError ? err.statusCode : httpStatus.INTERNAL_SERVER_ERROR;
   const message = err instanceof AppError ? err.message : 'Internal Server Error';

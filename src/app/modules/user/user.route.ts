@@ -4,6 +4,7 @@ import { Role } from './user.interface';
 import { checkAuth } from '../../middlewares/checkAuth';
 import { validateRequest } from '../../middlewares/validateRequest';
 import { updateUserZodSchema } from './user.validation';
+import { createUserZodSchema } from '../auth/auth.validation';
 
 const router = Router();
 
