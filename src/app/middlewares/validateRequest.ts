@@ -8,8 +8,9 @@ export const validateRequest = (schema: AnyZodObject) => {
     try {
       await schema.parseAsync(req.body);
       next();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      throw new AppError(httpStatus.BAD_REQUEST, error.errors[0].message);
+      throw new AppError(httpStatus.BAD_REQUEST, 'Validation failed', error.errors);
     }
   };
 };

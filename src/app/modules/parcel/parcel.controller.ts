@@ -4,7 +4,6 @@ import { catchAsync } from '../../utils/catchAsync';
 import { sendResponse } from '../../utils/sendResponse';
 import { ParcelServices } from './parcel.service';
 import { AuthRequest } from '../../middlewares/checkAuth';
-// import { createParcelZodSchema, updateParcelStatusZodSchema } from './parcel.validation';
 
 const createParcel = catchAsync(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const parcel = await ParcelServices.createParcel(req.body, req.user!.id);
@@ -77,6 +76,16 @@ const unblockParcel = catchAsync(async (req: AuthRequest, res: Response, next: N
   });
 });
 
+const deleteParcel = catchAsync(async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const result = await ParcelServices.deleteParcel(req.params.id, req.user!.id, req.user!.role);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Parcel Deleted Successfully',
+    data: result,
+  });
+});
+
 export const ParcelControllers = {
   createParcel,
   cancelParcel,
@@ -85,4 +94,5 @@ export const ParcelControllers = {
   getParcels,
   blockParcel,
   unblockParcel,
+  deleteParcel,
 };

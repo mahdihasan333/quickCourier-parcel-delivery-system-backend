@@ -1,5 +1,4 @@
 import httpStatus from 'http-status-codes';
-import { JwtPayload } from 'jsonwebtoken';
 import { Parcel } from './parcel.model';
 import { User } from '../user/user.model';
 import { generateTrackingId } from '../../utils/generateTrackingId';
@@ -9,9 +8,13 @@ import { Role } from '../user/user.interface';
 
 const createParcel = async (payload: Partial<IParcel>, senderId: string) => {
   const { receiver, type, weight, senderAddress, receiverAddress, fee } = payload;
+  const sender = await User.findById(senderId);
   const receiverUser = await User.findById(receiver);
+  if (!sender || sender.isActive === 'BLOCKED') {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Sender is invalid or blocked');
+  }
   if (!receiverUser || receiverUser.isActive === 'BLOCKED') {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid or blocked receiver');
+    throw new AppError(httpStatus.BAD_REQUEST, 'Receiver is invalid or blocked');
   }
   const trackingId = generateTrackingId();
   const parcel = await Parcel.create({
@@ -132,6 +135,24 @@ const unblockParcel = async (parcelId: string) => {
   return parcel;
 };
 
+const deleteParcel = async (parcelId: string, userId: string, role: Role) => {
+  const parcel = await Parcel.findById(parcelId);
+  if (!parcel) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Parcel not found');
+  }
+  if (role !== Role.ADMIN && role !== Role.SUPER_ADMIN && parcel.sender.toString() !== userId) {
+    throw new AppError(httpStatus.FORBIDDEN, 'Unauthorized: Only sender or admin can delete');
+  }
+  if (parcel.status !== ParcelStatus.REQUESTED) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Cannot delete dispatched parcel');
+  }
+  if (parcel.isBlocked) {
+    throw new AppError(httpStatus.FORBIDDEN, 'Parcel is blocked');
+  }
+  await parcel.deleteOne();
+  return { message: 'Parcel deleted successfully' };
+};
+
 export const ParcelServices = {
   createParcel,
   cancelParcel,
@@ -140,4 +161,5 @@ export const ParcelServices = {
   getParcelsByUser,
   blockParcel,
   unblockParcel,
+  deleteParcel,
 };

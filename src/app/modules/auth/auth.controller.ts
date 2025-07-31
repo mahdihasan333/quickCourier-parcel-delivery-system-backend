@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Request, Response, NextFunction } from 'express';
 import httpStatus from 'http-status-codes';
 import { catchAsync } from '../../utils/catchAsync';
 import { sendResponse } from '../../utils/sendResponse';
 import { AuthServices } from './auth.service';
-import { createUserZodSchema } from '../user/user.validation';
 
 const registerUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const user = await AuthServices.registerUser(req.body);

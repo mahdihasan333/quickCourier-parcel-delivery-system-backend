@@ -14,5 +14,6 @@ router.patch('/status/:id', validateRequest(updateParcelStatusZodSchema), checkA
 router.get('/me', checkAuth(Role.SENDER, Role.RECEIVER, Role.ADMIN, Role.SUPER_ADMIN), ParcelControllers.getParcels);
 router.patch('/block/:id', checkAuth(Role.ADMIN, Role.SUPER_ADMIN), ParcelControllers.blockParcel);
 router.patch('/unblock/:id', checkAuth(Role.ADMIN, Role.SUPER_ADMIN), ParcelControllers.unblockParcel);
+router.delete('/:id', checkAuth(Role.SENDER, Role.ADMIN, Role.SUPER_ADMIN), ParcelControllers.deleteParcel);
 
 export const ParcelRoutes = router;

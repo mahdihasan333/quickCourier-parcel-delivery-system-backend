@@ -26,7 +26,7 @@ export interface IUser {
   phone?: string;
   picture?: string;
   address?: string;
-  isDeleted?: boolean;
+  isDeleted: boolean;
   isActive?: IsActive;
   isVerified?: boolean;
   role: Role;
