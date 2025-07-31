@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import httpStatus from 'http-status-codes';
-import AppError from '../utils/AppError';
+import AppError from './AppError';
 
 export const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
   const statusCode = err instanceof AppError ? err.statusCode : httpStatus.INTERNAL_SERVER_ERROR;

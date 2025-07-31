@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import httpStatus from 'http-status-codes';
 import { envVars } from '../config/env';
-import AppError from '../utils/AppError';
 import { Role } from '../modules/user/user.interface';
+import AppError from './AppError';
 
 export interface AuthRequest extends Request {
   user?: { id: string; role: Role };
@@ -25,6 +25,7 @@ export const checkAuth = (...roles: Role[]) => {
       next();
     } catch (error) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid token');
+      console.log(error);
     }
   };
 };
