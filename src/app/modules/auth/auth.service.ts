@@ -2,9 +2,9 @@ import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import httpStatus from 'http-status-codes';
 import { envVars } from '../../config/env';
-import AppError from '../../utils/AppError';
 import { IAuthProvider, IUser } from '../user/user.interface';
 import { User } from '../user/user.model';
+import AppError from '../../utils/AppError';
 
 const loginUser = async (email: string, password: string) => {
   const user = await User.findOne({ email });

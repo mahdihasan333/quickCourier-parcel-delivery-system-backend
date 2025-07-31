@@ -4,7 +4,7 @@ import { catchAsync } from '../../utils/catchAsync';
 import { sendResponse } from '../../utils/sendResponse';
 import { ParcelServices } from './parcel.service';
 import { AuthRequest } from '../../middlewares/checkAuth';
-import { createParcelZodSchema, updateParcelStatusZodSchema } from './parcel.validation';
+// import { createParcelZodSchema, updateParcelStatusZodSchema } from './parcel.validation';
 
 const createParcel = catchAsync(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const parcel = await ParcelServices.createParcel(req.body, req.user!.id);

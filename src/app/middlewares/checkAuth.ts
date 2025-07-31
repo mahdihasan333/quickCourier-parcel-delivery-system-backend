@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import httpStatus from 'http-status-codes';
 import { envVars } from '../config/env';
 import { Role } from '../modules/user/user.interface';
-import AppError from './AppError';
+import AppError from '../utils/AppError';
 
 export interface AuthRequest extends Request {
   user?: { id: string; role: Role };
@@ -23,9 +23,12 @@ export const checkAuth = (...roles: Role[]) => {
       }
       req.user = decoded;
       next();
-    } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      if (error.name === 'TokenExpiredError') {
+        throw new AppError(httpStatus.UNAUTHORIZED, 'Token has expired');
+      }
       throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid token');
-      console.log(error);
     }
   };
 };
