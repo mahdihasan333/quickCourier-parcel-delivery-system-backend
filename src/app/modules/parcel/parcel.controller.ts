@@ -32,7 +32,7 @@ const confirmDelivery = catchAsync(async (req: AuthRequest, res: Response, next:
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'Delivery Confirmed Successfully',
+    message: 'Delivery Confirmed Successfully!',
     data: parcel,
   });
 });
