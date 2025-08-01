@@ -24,6 +24,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserServices = void 0;
+// user.service.ts
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const env_1 = require("../../config/env");
@@ -75,8 +76,27 @@ const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
         },
     };
 });
+const deleteUser = (userId, decodedToken) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const user = yield user_model_1.User.findById(userId);
+    if (!user) {
+        throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, 'User Not Found');
+    }
+    if (decodedToken.role !== user_interface_1.Role.ADMIN && decodedToken.role !== user_interface_1.Role.SUPER_ADMIN) {
+        throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, 'You are not authorized to delete users');
+    }
+    if (user.role === user_interface_1.Role.SUPER_ADMIN && decodedToken.role === user_interface_1.Role.ADMIN) {
+        throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, 'Admins cannot delete Super Admins');
+    }
+    if (user._id.toString() === ((_a = decodedToken._id) === null || _a === void 0 ? void 0 : _a.toString())) {
+        throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, 'You cannot delete your own account');
+    }
+    yield user_model_1.User.findByIdAndUpdate(userId, { isDeleted: true }, { new: true });
+    return { message: 'User deleted successfully' };
+});
 exports.UserServices = {
     createUser,
     getAllUsers,
     updateUser,
+    deleteUser,
 };

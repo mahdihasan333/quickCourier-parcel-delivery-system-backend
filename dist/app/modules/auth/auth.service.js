@@ -33,9 +33,17 @@ const loginUser = (email, password) => __awaiter(void 0, void 0, void 0, functio
     if (!isMatch) {
         throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, 'Invalid email or password');
     }
-    const token = jsonwebtoken_1.default.sign({ id: user._id, role: user.role }, env_1.envVars.JWT_ACCESS_SECRET, {
-        expiresIn: env_1.envVars.JWT_ACCESS_EXPIRES,
-    });
+    if (!env_1.envVars.JWT_ACCESS_SECRET) {
+        throw new AppError_1.default(http_status_codes_1.default.INTERNAL_SERVER_ERROR, 'JWT_ACCESS_SECRET is not defined');
+    }
+    const tokenPayload = {
+        id: user._id.toString(),
+        role: user.role,
+    };
+    const tokenOptions = {
+        expiresIn: env_1.envVars.JWT_ACCESS_EXPIRES || '1h',
+    };
+    const token = jsonwebtoken_1.default.sign(tokenPayload, env_1.envVars.JWT_ACCESS_SECRET, tokenOptions);
     return { token, user };
 });
 const registerUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {

@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+// user.controller.ts
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Request, Response, NextFunction } from 'express';
 import httpStatus from 'http-status-codes';
 import { catchAsync } from '../../utils/catchAsync';
@@ -28,7 +31,7 @@ const updateUser = catchAsync(async (req: AuthRequest, res: Response, next: Next
   });
 });
 
-const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+const getAllUsers = catchAsync(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const result = await UserServices.getAllUsers();
   sendResponse(res, {
     success: true,
@@ -39,8 +42,21 @@ const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFun
   });
 });
 
+const deleteUser = catchAsync(async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const userId = req.params.id;
+  const verifiedToken = req.user;
+  const result = await UserServices.deleteUser(userId, verifiedToken!);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'User Deleted Successfully',
+    data: result,
+  });
+});
+
 export const UserControllers = {
   createUser,
   getAllUsers,
   updateUser,
+  deleteUser,
 };

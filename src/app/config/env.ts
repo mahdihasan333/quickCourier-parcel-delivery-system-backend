@@ -12,7 +12,7 @@ interface EnvConfig {
 }
 
 const loadEnvVariables = (): EnvConfig => {
-  const requiredEnvVariables: string[] = [
+  const requiredEnvVariables: (keyof EnvConfig)[] = [
     'PORT',
     'DB_URL',
     'NODE_ENV',

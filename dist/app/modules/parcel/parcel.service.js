@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParcelServices = void 0;
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
+const mongoose_1 = require("mongoose");
 const parcel_model_1 = require("./parcel.model");
 const user_model_1 = require("../user/user.model");
 const generateTrackingId_1 = require("../../utils/generateTrackingId");
@@ -85,6 +86,7 @@ const confirmDelivery = (parcelId, receiverId) => __awaiter(void 0, void 0, void
 });
 const updateStatus = (parcelId, status, updatedBy) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
+    // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
     const validStatusFlow = {
         [parcel_interface_1.ParcelStatus.REQUESTED]: [parcel_interface_1.ParcelStatus.APPROVED, parcel_interface_1.ParcelStatus.CANCELLED],
         [parcel_interface_1.ParcelStatus.APPROVED]: [parcel_interface_1.ParcelStatus.DISPATCHED],
@@ -102,7 +104,12 @@ const updateStatus = (parcelId, status, updatedBy) => __awaiter(void 0, void 0, 
         throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, `Invalid status transition from ${parcel.status} to ${status}`);
     }
     parcel.status = status;
-    parcel.statusLogs.push({ status, timestamp: new Date(), updatedBy, note: `Status updated to ${status}` });
+    parcel.statusLogs.push({
+        status,
+        timestamp: new Date(),
+        updatedBy: new mongoose_1.Types.ObjectId(updatedBy),
+        note: `Status updated to ${status}`,
+    });
     yield parcel.save();
     return parcel;
 });

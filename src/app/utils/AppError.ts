@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import httpStatus from 'http-status-codes';
 
 class AppError extends Error {
   public statusCode: number;

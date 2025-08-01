@@ -1,6 +1,6 @@
+// user.service.ts
 import bcryptjs from 'bcryptjs';
 import httpStatus from 'http-status-codes';
-import { JwtPayload } from 'jsonwebtoken';
 import { envVars } from '../../config/env';
 import { IAuthProvider, IUser, Role } from './user.interface';
 import { User } from './user.model';
@@ -27,7 +27,7 @@ const createUser = async (payload: Partial<IUser>) => {
   return user;
 };
 
-const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken: JwtPayload) => {
+const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken: IUser) => {
   const ifUserExist = await User.findById(userId);
   if (!ifUserExist) {
     throw new AppError(httpStatus.NOT_FOUND, 'User Not Found');
@@ -67,8 +67,31 @@ const getAllUsers = async () => {
   };
 };
 
+const deleteUser = async (userId: string, decodedToken: IUser) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User Not Found');
+  }
+
+  if (decodedToken.role !== Role.ADMIN && decodedToken.role !== Role.SUPER_ADMIN) {
+    throw new AppError(httpStatus.FORBIDDEN, 'You are not authorized to delete users');
+  }
+
+  if (user.role === Role.SUPER_ADMIN && decodedToken.role === Role.ADMIN) {
+    throw new AppError(httpStatus.FORBIDDEN, 'Admins cannot delete Super Admins');
+  }
+
+  if (user._id.toString() === decodedToken._id?.toString()) {
+    throw new AppError(httpStatus.FORBIDDEN, 'You cannot delete your own account');
+  }
+
+  await User.findByIdAndUpdate(userId, { isDeleted: true }, { new: true });
+  return { message: 'User deleted successfully' };
+};
+
 export const UserServices = {
   createUser,
   getAllUsers,
   updateUser,
+  deleteUser,
 };

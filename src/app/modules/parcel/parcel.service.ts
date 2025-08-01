@@ -1,4 +1,5 @@
 import httpStatus from 'http-status-codes';
+import { Types } from 'mongoose';
 import { Parcel } from './parcel.model';
 import { User } from '../user/user.model';
 import { generateTrackingId } from '../../utils/generateTrackingId';
@@ -73,6 +74,7 @@ const confirmDelivery = async (parcelId: string, receiverId: string) => {
 };
 
 const updateStatus = async (parcelId: string, status: ParcelStatus, updatedBy: string) => {
+  // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
   const validStatusFlow: { [key in ParcelStatus]?: ParcelStatus[] } = {
     [ParcelStatus.REQUESTED]: [ParcelStatus.APPROVED, ParcelStatus.CANCELLED],
     [ParcelStatus.APPROVED]: [ParcelStatus.DISPATCHED],
@@ -90,7 +92,12 @@ const updateStatus = async (parcelId: string, status: ParcelStatus, updatedBy: s
     throw new AppError(httpStatus.BAD_REQUEST, `Invalid status transition from ${parcel.status} to ${status}`);
   }
   parcel.status = status;
-  parcel.statusLogs.push({ status, timestamp: new Date(), updatedBy, note: `Status updated to ${status}` });
+  parcel.statusLogs.push({
+    status,
+    timestamp: new Date(),
+    updatedBy: new Types.ObjectId(updatedBy),
+    note: `Status updated to ${status}`,
+  });
   await parcel.save();
   return parcel;
 };
