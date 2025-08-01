@@ -19,9 +19,13 @@ const loginUser = async (email: string, password: string) => {
   if (!isMatch) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Invalid email or password');
   }
-  const token = jwt.sign({ id: user._id, role: user.role }, envVars.JWT_ACCESS_SECRET, {
-    expiresIn: envVars.JWT_ACCESS_EXPIRES,
-  });
+  const token = jwt.sign(
+    { id: user._id.toString(), role: user.role },
+    envVars.JWT_ACCESS_SECRET,
+    {
+      expiresIn: envVars.JWT_ACCESS_EXPIRES,
+    }
+  );
   return { token, user };
 };
 
