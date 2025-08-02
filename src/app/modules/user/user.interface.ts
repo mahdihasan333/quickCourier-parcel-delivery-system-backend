@@ -20,7 +20,7 @@ export enum IsActive {
 
 export interface IUser {
   _id?: Types.ObjectId;
-  id?: string; // Added for req.user.id
+  id?: string; // For req.user.id
   name: string;
   email: string;
   password?: string;

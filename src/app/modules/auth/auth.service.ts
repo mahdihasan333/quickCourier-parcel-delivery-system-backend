@@ -30,12 +30,18 @@ const loginUser = async (email: string, password: string) => {
   }
 
   const tokenPayload = {
-    id: user._id.toString(),
+    _id: user._id.toString(),
     role: user.role,
+    email: user.email,
+    name: user.name,
+    isActive: user.isActive,
+    isVerified: user.isVerified,
+    isDeleted: user.isDeleted,
+    auths: user.auths,
   };
 
   const tokenOptions: SignOptions = {
-    expiresIn: envVars.JWT_ACCESS_EXPIRES || '1h', 
+    expiresIn: envVars.JWT_ACCESS_EXPIRES as string, // Ensure string type
   };
 
   const token = jwt.sign(tokenPayload, envVars.JWT_ACCESS_SECRET, tokenOptions);

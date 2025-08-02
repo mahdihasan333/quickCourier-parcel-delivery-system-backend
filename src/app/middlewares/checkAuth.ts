@@ -28,8 +28,8 @@ export const checkAuth = (...roles: Role[]): RequestHandler => {
         throw new AppError(httpStatus.UNAUTHORIZED, 'No user ID in token');
       }
 
-      // Fetch user from database
-      const user = await User.findById(decoded._id);
+      // Fetch user from database and ensure it matches IUser
+      const user = await User.findById(decoded._id).lean();
       if (!user) {
         throw new AppError(httpStatus.NOT_FOUND, 'User not found');
       }
@@ -38,22 +38,26 @@ export const checkAuth = (...roles: Role[]): RequestHandler => {
         throw new AppError(httpStatus.FORBIDDEN, 'User is blocked');
       }
 
-      if (roles.length && !roles.includes(user.role)) {
+      if (roles.length && !roles.includes(user.role as Role)) {
         throw new AppError(httpStatus.FORBIDDEN, 'Unauthorized role');
       }
 
-      // Set req.user with id and other necessary fields
+      // Explicitly map Mongoose document to IUser
       req.user = {
         _id: user._id,
-        id: user._id.toString(), // Convert _id to string
-        role: user.role,
-        email: user.email,
+        id: user._id.toString(),
         name: user.name,
-        isActive: user.isActive,
-        isVerified: user.isVerified,
+        email: user.email,
+        password: user.password,
+        phone: user.phone,
+        picture: user.picture,
+        address: user.address,
         isDeleted: user.isDeleted,
+        isActive: user.isActive as IsActive,
+        isVerified: user.isVerified,
+        role: user.role as Role,
         auths: user.auths,
-      } as IUser;
+      };
 
       next();
     } catch (error: any) {

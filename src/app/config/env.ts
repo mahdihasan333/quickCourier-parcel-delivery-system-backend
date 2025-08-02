@@ -8,7 +8,7 @@ interface EnvConfig {
   NODE_ENV: 'development' | 'production';
   BCRYPT_SALT_ROUND: string;
   JWT_ACCESS_SECRET: string;
-  JWT_ACCESS_EXPIRES: string;
+  JWT_ACCESS_EXPIRES: string | number;
 }
 
 const loadEnvVariables = (): EnvConfig => {

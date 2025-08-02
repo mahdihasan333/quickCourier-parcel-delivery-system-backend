@@ -17,76 +17,93 @@ const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const catchAsync_1 = require("../../utils/catchAsync");
 const sendResponse_1 = require("../../utils/sendResponse");
 const parcel_service_1 = require("./parcel.service");
+const AppError_1 = __importDefault(require("../../utils/AppError"));
 const createParcel = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.user)
+        throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, 'User is not logged in');
     const parcel = yield parcel_service_1.ParcelServices.createParcel(req.body, req.user.id);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.CREATED,
-        message: 'Parcel Created Successfully',
+        message: 'Parcel created successfully',
         data: parcel,
     });
 }));
 const cancelParcel = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.user)
+        throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, 'User is not logged in');
     const parcel = yield parcel_service_1.ParcelServices.cancelParcel(req.params.id, req.user.id);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
-        message: 'Parcel Cancelled Successfully',
+        message: 'Parcel cancelled successfully',
         data: parcel,
     });
 }));
 const confirmDelivery = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.user)
+        throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, 'User is not logged in');
     const parcel = yield parcel_service_1.ParcelServices.confirmDelivery(req.params.id, req.user.id);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
-        message: 'Delivery Confirmed Successfully!',
+        message: 'Delivery confirmed successfully',
         data: parcel,
     });
 }));
 const updateStatus = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.user)
+        throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, 'User is not logged in');
     const parcel = yield parcel_service_1.ParcelServices.updateStatus(req.params.id, req.body.status, req.user.id);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
-        message: 'Parcel Status Updated Successfully',
+        message: 'Parcel status updated successfully',
         data: parcel,
     });
 }));
 const getParcels = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.user)
+        throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, 'User is not logged in');
     const result = yield parcel_service_1.ParcelServices.getParcelsByUser(req.user.id, req.user.role);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
-        message: 'Parcels Retrieved Successfully',
+        message: 'Parcels retrieved successfully',
         data: result.data,
         meta: result.meta,
     });
 }));
 const blockParcel = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.user)
+        throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, 'User is not logged in');
     const parcel = yield parcel_service_1.ParcelServices.blockParcel(req.params.id);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
-        message: 'Parcel Blocked Successfully',
+        message: 'Parcel blocked successfully',
         data: parcel,
     });
 }));
 const unblockParcel = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.user)
+        throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, 'User is not logged in');
     const parcel = yield parcel_service_1.ParcelServices.unblockParcel(req.params.id);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
-        message: 'Parcel Unblocked Successfully',
+        message: 'Parcel unblocked successfully',
         data: parcel,
     });
 }));
 const deleteParcel = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.user)
+        throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, 'User is not logged in');
     const result = yield parcel_service_1.ParcelServices.deleteParcel(req.params.id, req.user.id, req.user.role);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
-        message: 'Parcel Deleted Successfully',
+        message: 'Parcel deleted successfully',
         data: result,
     });
 }));

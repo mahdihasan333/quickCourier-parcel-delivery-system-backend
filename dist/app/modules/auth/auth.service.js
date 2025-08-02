@@ -37,11 +37,17 @@ const loginUser = (email, password) => __awaiter(void 0, void 0, void 0, functio
         throw new AppError_1.default(http_status_codes_1.default.INTERNAL_SERVER_ERROR, 'JWT_ACCESS_SECRET is not defined');
     }
     const tokenPayload = {
-        id: user._id.toString(),
+        _id: user._id.toString(),
         role: user.role,
+        email: user.email,
+        name: user.name,
+        isActive: user.isActive,
+        isVerified: user.isVerified,
+        isDeleted: user.isDeleted,
+        auths: user.auths,
     };
     const tokenOptions = {
-        expiresIn: env_1.envVars.JWT_ACCESS_EXPIRES || '1h',
+        expiresIn: env_1.envVars.JWT_ACCESS_EXPIRES,
     };
     const token = jsonwebtoken_1.default.sign(tokenPayload, env_1.envVars.JWT_ACCESS_SECRET, tokenOptions);
     return { token, user };
