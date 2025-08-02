@@ -40,7 +40,7 @@ const confirmDelivery = (0, catchAsync_1.catchAsync)((req, res, next) => __await
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
-        message: 'Delivery Confirmed Successfully',
+        message: 'Delivery Confirmed Successfully!',
         data: parcel,
     });
 }));

@@ -20,6 +20,7 @@ export enum IsActive {
 
 export interface IUser {
   _id?: Types.ObjectId;
+  id?: string; // নতুন ফিল্ড যোগ করা হলো, req.user এর জন্য
   name: string;
   email: string;
   password?: string;
