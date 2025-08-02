@@ -42,7 +42,7 @@ const loginUser = async (email: string, password: string) => {
 
   // Pass JWT_ACCESS_EXPIRES directly as a string
   const tokenOptions: SignOptions = {
-    expiresIn: envVars.JWT_ACCESS_EXPIRES as jwt.SignOptions['expiresIn'], // e.g., '1h'
+    expiresIn: envVars.JWT_ACCESS_EXPIRES, // e.g., '1h'
   };
 
   const token = jwt.sign(tokenPayload, envVars.JWT_ACCESS_SECRET, tokenOptions);

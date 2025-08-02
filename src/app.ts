@@ -6,7 +6,15 @@ import { globalErrorHandler } from './app/middlewares/globalErrorHandler';
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "https://quick-courier-parcel-delivery-syste.vercel.app",
+      "http://localhost:5173",
+    ],
+    credentials: true,
+  })
+);
 
 app.use('/api/v1', router);
 
