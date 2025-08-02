@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.catchAsync = void 0;
+// import { AuthRequest } from '../middlewares/checkAuth';
 const AppError_1 = __importDefault(require("./AppError"));
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 // জেনেরিক টাইপ ব্যবহার করে Request বা AuthRequest সাপোর্ট করা

@@ -52,7 +52,7 @@ const loginUser = (email, password) => __awaiter(void 0, void 0, void 0, functio
         auths: user.auths || [],
     };
     const tokenOptions = {
-        expiresIn: env_1.envVars.JWT_ACCESS_EXPIRES, // টাইপ মিলবে
+        expiresIn: Number(env_1.envVars.JWT_ACCESS_EXPIRES), // টাইপ মিলবে
     };
     const token = jsonwebtoken_1.default.sign(tokenPayload, env_1.envVars.JWT_ACCESS_SECRET, tokenOptions);
     return { token, user };

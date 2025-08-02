@@ -1,12 +1,12 @@
 // catchAsync.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response, NextFunction } from 'express';
-import { AuthRequest } from '../middlewares/checkAuth';
+// import { AuthRequest } from '../middlewares/checkAuth';
 import AppError from './AppError';
 import httpStatus from 'http-status-codes';
 
 // জেনেরিক টাইপ ব্যবহার করে Request বা AuthRequest সাপোর্ট করা
-export const catchAsync = <T extends Request | AuthRequest>(
+export const catchAsync = <T extends Request>(
   fn: (req: T, res: Response, next: NextFunction) => Promise<any>
 ) => {
   return (req: T, res: Response, next: NextFunction) => {

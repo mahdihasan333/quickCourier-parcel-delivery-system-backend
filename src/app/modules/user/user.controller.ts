@@ -6,7 +6,8 @@ import httpStatus from 'http-status-codes';
 import { catchAsync } from '../../utils/catchAsync';
 import { sendResponse } from '../../utils/sendResponse';
 import { UserServices } from './user.service';
-import { AuthRequest } from '../../middlewares/checkAuth';
+
+import { IUser } from './user.interface';
 
 const createUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const user = await UserServices.createUser(req.body);
@@ -18,11 +19,11 @@ const createUser = catchAsync(async (req: Request, res: Response, next: NextFunc
   });
 });
 
-const updateUser = catchAsync(async (req: AuthRequest, res: Response, next: NextFunction) => {
+const updateUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const userId = req.params.id;
   const verifiedToken = req.user;
   const payload = req.body;
-  const user = await UserServices.updateUser(userId, payload, verifiedToken!);
+  const user = await UserServices.updateUser(userId, payload, verifiedToken as IUser);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -31,7 +32,7 @@ const updateUser = catchAsync(async (req: AuthRequest, res: Response, next: Next
   });
 });
 
-const getAllUsers = catchAsync(async (req: AuthRequest, res: Response, next: NextFunction) => {
+const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const result = await UserServices.getAllUsers();
   sendResponse(res, {
     success: true,
@@ -42,10 +43,10 @@ const getAllUsers = catchAsync(async (req: AuthRequest, res: Response, next: Nex
   });
 });
 
-const deleteUser = catchAsync(async (req: AuthRequest, res: Response, next: NextFunction) => {
+const deleteUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const userId = req.params.id;
   const verifiedToken = req.user;
-  const result = await UserServices.deleteUser(userId, verifiedToken!);
+  const result = await UserServices.deleteUser(userId, verifiedToken as IUser);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,

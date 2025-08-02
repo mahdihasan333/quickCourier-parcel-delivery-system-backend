@@ -1,41 +1,44 @@
 // src/app/middlewares/checkAuth.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import httpStatus from 'http-status-codes';
-import { envVars } from '../config/env';
-import { IUser, Role, IsActive } from '../modules/user/user.interface';
-import { User } from '../modules/user/user.model';
-import AppError from '../utils/AppError';
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import httpStatus from "http-status-codes";
+import { envVars } from "../config/env";
+import { IUser, IsActive } from "../modules/user/user.interface";
+import { User } from "../modules/user/user.model";
+import AppError from "../utils/AppError";
 
 // Extend the Request interface to include user property
-export interface AuthRequest extends Request {
-  user?: IUser;
-}
 
 // Custom RequestHandler type for AuthRequest
-export type AuthRequestHandler = (req: AuthRequest, res: Response, next: NextFunction) => Promise<void> | void;
+// export type AuthRequestHandler = (req: AuthRequest, res: Response, next: NextFunction) => Promise<void> | void;
 
-export const checkAuth = (...roles: Role[]): AuthRequestHandler => {
-  return async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+export const checkAuth = (roles: any) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const token = req.headers.authorization?.split(' ')[1];
+      const token = req.headers.authorization?.split(" ")[1];
       if (!token) {
-        throw new AppError(httpStatus.UNAUTHORIZED, 'No token provided');
+        throw new AppError(httpStatus.UNAUTHORIZED, "No token provided");
       }
 
       if (!envVars.JWT_ACCESS_SECRET) {
-        throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'JWT_ACCESS_SECRET is not defined');
+        throw new AppError(
+          httpStatus.INTERNAL_SERVER_ERROR,
+          "JWT_ACCESS_SECRET is not defined"
+        );
       }
 
-      const decoded = jwt.verify(token, envVars.JWT_ACCESS_SECRET) as Partial<IUser>;
+      const decoded = jwt.verify(
+        token,
+        envVars.JWT_ACCESS_SECRET
+      ) as Partial<IUser>;
       if (!decoded._id) {
-        throw new AppError(httpStatus.UNAUTHORIZED, 'No user ID in token');
+        throw new AppError(httpStatus.UNAUTHORIZED, "No user ID in token");
       }
 
       const user = await User.findById(decoded._id).lean().exec();
       if (!user) {
-        throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+        throw new AppError(httpStatus.NOT_FOUND, "User not found");
       }
 
       const userData: IUser = {
@@ -55,20 +58,26 @@ export const checkAuth = (...roles: Role[]): AuthRequestHandler => {
       };
 
       if (userData.isActive === IsActive.BLOCKED) {
-        throw new AppError(httpStatus.FORBIDDEN, 'User is blocked');
+        throw new AppError(httpStatus.FORBIDDEN, "User is blocked");
       }
 
       if (roles.length && !roles.includes(userData.role)) {
-        throw new AppError(httpStatus.FORBIDDEN, 'User does not have required role');
+        throw new AppError(
+          httpStatus.FORBIDDEN,
+          "User does not have required role"
+        );
       }
 
       req.user = userData;
       next();
     } catch (error: any) {
-      if (error.name === 'TokenExpiredError') {
-        throw new AppError(httpStatus.UNAUTHORIZED, 'Token has expired');
+      if (error.name === "TokenExpiredError") {
+        throw new AppError(httpStatus.UNAUTHORIZED, "Token has expired");
       }
-      throw new AppError(httpStatus.UNAUTHORIZED, error.message || 'Invalid token');
+      throw new AppError(
+        httpStatus.UNAUTHORIZED,
+        error.message || "Invalid token"
+      );
     }
   };
 };
