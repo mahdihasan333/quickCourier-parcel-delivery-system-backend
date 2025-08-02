@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthServices = void 0;
+// src/app/modules/auth/auth.service.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -36,8 +37,12 @@ const loginUser = (email, password) => __awaiter(void 0, void 0, void 0, functio
     if (!env_1.envVars.JWT_ACCESS_SECRET) {
         throw new AppError_1.default(http_status_codes_1.default.INTERNAL_SERVER_ERROR, 'JWT_ACCESS_SECRET is not defined');
     }
+    if (!env_1.envVars.JWT_ACCESS_EXPIRES) {
+        throw new AppError_1.default(http_status_codes_1.default.INTERNAL_SERVER_ERROR, 'JWT_ACCESS_EXPIRES is not defined');
+    }
     const tokenPayload = {
         _id: user._id.toString(),
+        id: user._id.toString(),
         role: user.role,
         email: user.email,
         name: user.name,
@@ -46,9 +51,8 @@ const loginUser = (email, password) => __awaiter(void 0, void 0, void 0, functio
         isDeleted: user.isDeleted,
         auths: user.auths || [],
     };
-    // Pass JWT_ACCESS_EXPIRES directly as a string
     const tokenOptions = {
-        expiresIn: env_1.envVars.JWT_ACCESS_EXPIRES, // e.g., '1h'
+        expiresIn: env_1.envVars.JWT_ACCESS_EXPIRES, // টাইপ মিলবে
     };
     const token = jsonwebtoken_1.default.sign(tokenPayload, env_1.envVars.JWT_ACCESS_SECRET, tokenOptions);
     return { token, user };

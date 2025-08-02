@@ -1,3 +1,4 @@
+// src/app/modules/auth/auth.service.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -29,8 +30,13 @@ const loginUser = async (email: string, password: string) => {
     throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'JWT_ACCESS_SECRET is not defined');
   }
 
+  if (!envVars.JWT_ACCESS_EXPIRES) {
+    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'JWT_ACCESS_EXPIRES is not defined');
+  }
+
   const tokenPayload = {
     _id: user._id.toString(),
+    id: user._id.toString(),
     role: user.role,
     email: user.email,
     name: user.name,
@@ -40,9 +46,8 @@ const loginUser = async (email: string, password: string) => {
     auths: user.auths || [],
   };
 
-  // Pass JWT_ACCESS_EXPIRES directly as a string
   const tokenOptions: SignOptions = {
-    expiresIn: envVars.JWT_ACCESS_EXPIRES, // e.g., '1h'
+    expiresIn: Number(envVars.JWT_ACCESS_EXPIRES), // টাইপ মিলবে
   };
 
   const token = jwt.sign(tokenPayload, envVars.JWT_ACCESS_SECRET, tokenOptions);

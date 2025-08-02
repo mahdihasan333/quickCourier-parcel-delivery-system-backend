@@ -1,3 +1,4 @@
+// src/app/config/env.ts
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -8,7 +9,7 @@ interface EnvConfig {
   NODE_ENV: 'development' | 'production';
   BCRYPT_SALT_ROUND: string;
   JWT_ACCESS_SECRET: string;
-  JWT_ACCESS_EXPIRES: string;
+  JWT_ACCESS_EXPIRES: string; // শুধু string
 }
 
 const loadEnvVariables = (): EnvConfig => {

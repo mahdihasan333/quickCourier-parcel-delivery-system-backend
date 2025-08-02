@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
+// src/app/modules/user/user.model.ts
 const mongoose_1 = require("mongoose");
 const user_interface_1 = require("./user.interface");
 const authProviderSchema = new mongoose_1.Schema({

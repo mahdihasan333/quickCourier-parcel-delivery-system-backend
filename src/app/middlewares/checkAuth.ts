@@ -1,5 +1,6 @@
+// src/app/middlewares/checkAuth.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import httpStatus from 'http-status-codes';
 import { envVars } from '../config/env';
@@ -7,8 +8,16 @@ import { IUser, Role, IsActive } from '../modules/user/user.interface';
 import { User } from '../modules/user/user.model';
 import AppError from '../utils/AppError';
 
-export const checkAuth = (...roles: Role[]): RequestHandler => {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+// Extend the Request interface to include user property
+export interface AuthRequest extends Request {
+  user?: IUser;
+}
+
+// Custom RequestHandler type for AuthRequest
+export type AuthRequestHandler = (req: AuthRequest, res: Response, next: NextFunction) => Promise<void> | void;
+
+export const checkAuth = (...roles: Role[]): AuthRequestHandler => {
+  return async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const token = req.headers.authorization?.split(' ')[1];
       if (!token) {
@@ -24,20 +33,25 @@ export const checkAuth = (...roles: Role[]): RequestHandler => {
         throw new AppError(httpStatus.UNAUTHORIZED, 'No user ID in token');
       }
 
-      const user = await User.findById(decoded._id).exec();
+      const user = await User.findById(decoded._id).lean().exec();
       if (!user) {
         throw new AppError(httpStatus.NOT_FOUND, 'User not found');
       }
 
-      // IUser ইন্টারফেসে ম্যাপ করা
       const userData: IUser = {
-        _id: user._id.toString(),
+        _id: user._id,
+        id: user._id.toString(), // id প্রপার্টি যোগ করা হয়েছে
         name: user.name,
         email: user.email,
+        password: user.password,
+        phone: user.phone,
+        picture: user.picture,
+        address: user.address,
         isDeleted: user.isDeleted ?? false,
-        role: user.role as Role,
-        isActive: user.isActive as IsActive,
-        auths: user.auths || {},
+        isActive: user.isActive ?? IsActive.ACTIVE,
+        isVerified: user.isVerified ?? false,
+        role: user.role,
+        auths: user.auths ?? [],
       };
 
       if (userData.isActive === IsActive.BLOCKED) {
@@ -45,12 +59,10 @@ export const checkAuth = (...roles: Role[]): RequestHandler => {
       }
 
       if (roles.length && !roles.includes(userData.role)) {
-        throw new AppError(httpStatus.FORBIDDEN, 'User does not have the required role');
+        throw new AppError(httpStatus.FORBIDDEN, 'User does not have required role');
       }
 
-      // req.user এ অ্যাসাইন করা
-      req.user = userData as any; // Express-এর Request টাইপে user নেই, তাই any ব্যবহার করা হয়েছে
-
+      req.user = userData;
       next();
     } catch (error: any) {
       if (error.name === 'TokenExpiredError') {
@@ -60,10 +72,3 @@ export const checkAuth = (...roles: Role[]): RequestHandler => {
     }
   };
 };
-
-// Express-এর Request ইন্টারফেসে user প্রোপার্টি যোগ করা
-declare module 'express' {
-  interface Request {
-    user?: IUser;
-  }
-}

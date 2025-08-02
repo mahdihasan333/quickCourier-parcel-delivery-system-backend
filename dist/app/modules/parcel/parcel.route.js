@@ -1,15 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParcelRoutes = void 0;
+// src/app/modules/parcel/parcel.route.ts
 const express_1 = require("express");
 const checkAuth_1 = require("../../middlewares/checkAuth");
 const validateRequest_1 = require("../../middlewares/validateRequest");
 const parcel_controller_1 = require("./parcel.controller");
 const user_interface_1 = require("../user/user.interface");
 const parcel_validation_1 = require("./parcel.validation");
-// import { AuthRequest } from '../../middlewares/checkAuth';
 const router = (0, express_1.Router)();
-// RequestHandler টাইপ কাস্টিং করে AuthRequest সাপোর্ট করা
 router.post('/', (0, validateRequest_1.validateRequest)(parcel_validation_1.createParcelZodSchema), (0, checkAuth_1.checkAuth)(user_interface_1.Role.SENDER), parcel_controller_1.ParcelControllers.createParcel);
 router.patch('/cancel/:id', (0, checkAuth_1.checkAuth)(user_interface_1.Role.SENDER), parcel_controller_1.ParcelControllers.cancelParcel);
 router.patch('/confirm/:id', (0, checkAuth_1.checkAuth)(user_interface_1.Role.RECEIVER), parcel_controller_1.ParcelControllers.confirmDelivery);

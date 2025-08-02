@@ -1,3 +1,4 @@
+// src/app/modules/user/user.model.ts
 import { Schema, model } from 'mongoose';
 import { IUser, Role, IsActive, IAuthProvider } from './user.interface';
 

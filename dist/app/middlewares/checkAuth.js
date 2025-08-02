@@ -21,7 +21,7 @@ const user_model_1 = require("../modules/user/user.model");
 const AppError_1 = __importDefault(require("../utils/AppError"));
 const checkAuth = (...roles) => {
     return (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a, _b;
+        var _a, _b, _c, _d, _e;
         try {
             const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
             if (!token) {
@@ -34,18 +34,24 @@ const checkAuth = (...roles) => {
             if (!decoded._id) {
                 throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, 'No user ID in token');
             }
-            const user = yield user_model_1.User.findById(decoded._id).exec();
+            const user = yield user_model_1.User.findById(decoded._id).lean().exec();
             if (!user) {
                 throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, 'User not found');
             }
             const userData = {
                 _id: user._id,
+                id: user._id.toString(), // id প্রপার্টি যোগ করা হয়েছে
                 name: user.name,
                 email: user.email,
+                password: user.password,
+                phone: user.phone,
+                picture: user.picture,
+                address: user.address,
                 isDeleted: (_b = user.isDeleted) !== null && _b !== void 0 ? _b : false,
+                isActive: (_c = user.isActive) !== null && _c !== void 0 ? _c : user_interface_1.IsActive.ACTIVE,
+                isVerified: (_d = user.isVerified) !== null && _d !== void 0 ? _d : false,
                 role: user.role,
-                isActive: user.isActive,
-                auths: user.auths,
+                auths: (_e = user.auths) !== null && _e !== void 0 ? _e : [],
             };
             if (userData.isActive === user_interface_1.IsActive.BLOCKED) {
                 throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, 'User is blocked');
