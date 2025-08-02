@@ -21,7 +21,7 @@ const user_model_1 = require("../modules/user/user.model");
 const AppError_1 = __importDefault(require("../utils/AppError"));
 const checkAuth = (...roles) => {
     return (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a;
+        var _a, _b;
         try {
             const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
             if (!token) {
@@ -34,36 +34,33 @@ const checkAuth = (...roles) => {
             if (!decoded._id) {
                 throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, 'No user ID in token');
             }
-            // Fetch user from database
-            const user = yield user_model_1.User.findById(decoded._id);
+            const user = yield user_model_1.User.findById(decoded._id).exec();
             if (!user) {
                 throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, 'User not found');
             }
-            if (user.isActive === user_interface_1.IsActive.BLOCKED) {
-                throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, 'User is blocked');
-            }
-            if (roles.length && !roles.includes(user.role)) {
-                throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, 'Unauthorized role');
-            }
-            // Set req.user with id and other necessary fields
-            req.user = {
+            const userData = {
                 _id: user._id,
-                id: user._id.toString(), // Convert _id to string
-                role: user.role,
-                email: user.email,
                 name: user.name,
+                email: user.email,
+                isDeleted: (_b = user.isDeleted) !== null && _b !== void 0 ? _b : false,
+                role: user.role,
                 isActive: user.isActive,
-                isVerified: user.isVerified,
-                isDeleted: user.isDeleted,
                 auths: user.auths,
             };
+            if (userData.isActive === user_interface_1.IsActive.BLOCKED) {
+                throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, 'User is blocked');
+            }
+            if (roles.length && !roles.includes(userData.role)) {
+                throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, 'User does not have required role');
+            }
+            req.user = userData;
             next();
         }
         catch (error) {
             if (error.name === 'TokenExpiredError') {
                 throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, 'Token has expired');
             }
-            throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, 'Invalid token');
+            throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, error.message || 'Invalid token');
         }
     });
 };

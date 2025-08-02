@@ -22,7 +22,7 @@ const user_service_1 = require("../user/user.service");
 const AppError_1 = __importDefault(require("../../utils/AppError"));
 const user_model_1 = require("../user/user.model");
 const loginUser = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_model_1.User.findOne({ email });
+    const user = yield user_model_1.User.findOne({ email }).lean().exec();
     if (!user) {
         throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, 'Invalid email or password');
     }
@@ -44,10 +44,11 @@ const loginUser = (email, password) => __awaiter(void 0, void 0, void 0, functio
         isActive: user.isActive,
         isVerified: user.isVerified,
         isDeleted: user.isDeleted,
-        auths: user.auths,
+        auths: user.auths || [],
     };
+    // Pass JWT_ACCESS_EXPIRES directly as a string
     const tokenOptions = {
-        expiresIn: env_1.envVars.JWT_ACCESS_EXPIRES,
+        expiresIn: env_1.envVars.JWT_ACCESS_EXPIRES, // e.g., '1h'
     };
     const token = jsonwebtoken_1.default.sign(tokenPayload, env_1.envVars.JWT_ACCESS_SECRET, tokenOptions);
     return { token, user };

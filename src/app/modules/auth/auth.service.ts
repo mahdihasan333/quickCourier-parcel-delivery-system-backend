@@ -10,7 +10,7 @@ import { SignOptions } from 'jsonwebtoken';
 import { IUser } from '../user/user.interface';
 
 const loginUser = async (email: string, password: string) => {
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).lean().exec();
 
   if (!user) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Invalid email or password');
@@ -37,11 +37,12 @@ const loginUser = async (email: string, password: string) => {
     isActive: user.isActive,
     isVerified: user.isVerified,
     isDeleted: user.isDeleted,
-    auths: user.auths,
+    auths: user.auths || [],
   };
 
+  // Pass JWT_ACCESS_EXPIRES directly as a string
   const tokenOptions: SignOptions = {
-    expiresIn: envVars.JWT_ACCESS_EXPIRES as string, // Ensure string type
+    expiresIn: envVars.JWT_ACCESS_EXPIRES as jwt.SignOptions['expiresIn'], // e.g., '1h'
   };
 
   const token = jwt.sign(tokenPayload, envVars.JWT_ACCESS_SECRET, tokenOptions);
